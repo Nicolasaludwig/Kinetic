@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KINETIC // Dance Practice Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <h1>KINETIC</h1>
+      <span class="badge">STUDIO v1.0</span>
+    </div>
+
+    <div class="file-controls">
+      <label for="videoUpload" class="btn btn-outline">Carregar Vídeo (.mp4/.webm)</label>
+      <input type="file" id="videoUpload" accept="video/*" hidden />
+    </div>
+
+    <!-- Metrônomo Visual 8-Count -->
+    <div class="metronome-bar">
+      <div class="bpm-settings">
+        <label>BPM <input type="number" id="bpmInput" value="120" min="40" max="240" /></label>
+        <label title="Início do Tempo 1 (segundos)">Offset (s) <input type="number" id="offsetInput" value="0.0" step="0.1" /></label>
+        <button id="setOffsetBtn" class="btn btn-sm" title="Cravar o tempo 1 no instante atual">Cravar "1"</button>
+      </div>
+      <div class="eight-count" id="eightCountContainer">
+        <span class="beat" data-beat="1">1</span>
+        <span class="beat" data-beat="2">2</span>
+        <span class="beat" data-beat="3">3</span>
+        <span class="beat" data-beat="4">4</span>
+        <span class="beat" data-beat="5">5</span>
+        <span class="beat" data-beat="6">6</span>
+        <span class="beat" data-beat="7">7</span>
+        <span class="beat" data-beat="8">8</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- Coluna Esquerda: Vídeo + Timeline + Controles -->
+    <section class="player-section">
+      <div class="video-wrapper" id="videoWrapper">
+        <video id="danceVideo" playsinline></video>
+        <div class="video-overlay-badge" id="mirrorBadge" hidden>MIRRORED</div>
+        <div class="empty-state" id="emptyState">
+          <p>Carregue um vídeo de treino para começar a dissecar a coreografia</p>
+          <span>Atalhos: [Espaço] Play/Pause • [X] Espelhar • [A]/[B] Loop • [M] Marcador</span>
+        </div>
+      </div>
+
+      <!-- Timeline Customizada com Loop A-B e Markers -->
+      <div class="timeline-container">
+        <div class="timeline-track" id="timelineTrack">
+          <div class="loop-region" id="loopRegion" hidden></div>
+          <div class="timeline-progress" id="timelineProgress"></div>
+          <div class="markers-layer" id="markersLayer"></div>
+        </div>
+        <div class="time-readout">
+          <span id="currentTimeText">00:00.0</span>
+          <span id="loopStatusText">Loop: OFF</span>
+          <span id="durationText">00:00.0</span>
+        </div>
+      </div>
+
+      <!-- Barra de Controles do Player -->
+      <div class="controls-bar">
+        <div class="control-group">
+          <button id="playPauseBtn" class="btn btn-primary">Play</button>
+          <button id="mirrorBtn" class="btn">Espelhar (X)</button>
+        </div>
+
+        <div class="control-group">
+          <button id="setABtn" class="btn">Ponto A [</button>
+          <button id="setBBtn" class="btn">Ponto B ]</button>
+          <button id="clearLoopBtn" class="btn btn-danger">Limpar Loop</button>
+        </div>
+
+        <div class="control-group">
+          <label for="speedSelect">Velocidade:</label>
+          <select id="speedSelect">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.50x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1.00x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.50x</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <input type="text" id="markerNameInput" placeholder="Nome (ex: Refrão)" />
+          <button id="addMarkerBtn" class="btn btn-accent">+ Marcador (M)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coluna Direita: Stage Grid & Lista de Marcadores -->
+    <aside class="sidebar">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Stage Grid (Formação)</h2>
+          <div class="stage-actions">
+            <button id="addDancerBtn" class="btn btn-sm">+ Dançarino</button>
+            <button id="resetStageBtn" class="btn btn-sm">Resetar</button>
+          </div>
+        </div>
+        <p class="panel-hint">Arraste os pinos para mapear as posições no palco (FRENTE = base inferior).</p>
+        <canvas id="stageCanvas" width="320" height="240"></canvas>
+      </div>
+
+      <div class="panel markers-panel">
+        <div class="panel-header">
+          <h2>Marcadores & Formações</h2>
+        </div>
+        <ul id="markersList" class="markers-list"></ul>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
