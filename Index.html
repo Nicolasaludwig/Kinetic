@@ -3,29 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KINETIC // Dance Practice Studio</title>
+  <title>KINETIC</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo-dot"></span>
-      <h1>KINETIC</h1>
-      <span class="badge">STUDIO v1.0</span>
+  <header class="toolbar">
+    <div class="toolbar-left">
+      <span class="app-title">KINETIC</span>
+      <span class="divider"></span>
+      <button type="button" id="uploadTriggerBtn" class="btn">ABRIR ARQUIVO</button>
+      <input type="file" id="videoUpload" accept="video/mp4,video/webm,video/ogg,video/*" class="sr-only" />
+      <span id="statusReadout" class="status-readout">NENHUM ARQUIVO</span>
     </div>
 
-    <div class="file-controls">
-      <label for="videoUpload" class="btn btn-outline">Carregar Vídeo (.mp4/.webm)</label>
-      <input type="file" id="videoUpload" accept="video/*" hidden />
-    </div>
-
-    <!-- Metrônomo Visual 8-Count -->
-    <div class="metronome-bar">
-      <div class="bpm-settings">
-        <label>BPM <input type="number" id="bpmInput" value="120" min="40" max="240" /></label>
-        <label title="Início do Tempo 1 (segundos)">Offset (s) <input type="number" id="offsetInput" value="0.0" step="0.1" /></label>
-        <button id="setOffsetBtn" class="btn btn-sm" title="Cravar o tempo 1 no instante atual">Cravar "1"</button>
+    <div class="toolbar-right">
+      <div class="param-group">
+        <label for="bpmInput">BPM</label>
+        <input type="number" id="bpmInput" value="120" min="40" max="240" />
       </div>
+      <div class="param-group">
+        <label for="offsetInput">OFFSET (s)</label>
+        <input type="number" id="offsetInput" value="0.00" step="0.05" />
+        <button type="button" id="setOffsetBtn" class="btn" title="Definir tempo 1 no frame atual">SYNC 1</button>
+      </div>
+
       <div class="eight-count" id="eightCountContainer">
         <span class="beat" data-beat="1">1</span>
         <span class="beat" data-beat="2">2</span>
@@ -40,83 +41,82 @@
   </header>
 
   <main class="workspace">
-    <!-- Coluna Esquerda: Vídeo + Timeline + Controles -->
-    <section class="player-section">
-      <div class="video-wrapper" id="videoWrapper">
+    <section class="viewport-column">
+      <div class="video-stage" id="videoWrapper">
         <video id="danceVideo" playsinline></video>
-        <div class="video-overlay-badge" id="mirrorBadge" hidden>MIRRORED</div>
-        <div class="empty-state" id="emptyState">
-          <p>Carregue um vídeo de treino para começar a dissecar a coreografia</p>
-          <span>Atalhos: [Espaço] Play/Pause • [X] Espelhar • [A]/[B] Loop • [M] Marcador</span>
+        <div class="hud-tag" id="mirrorBadge" hidden>MIRROR: ON</div>
+        <div class="empty-slate" id="emptyState">
+          <p>ARRASTE UM ARQUIVO DE VÍDEO OU CLIQUE PARA SELECIONAR</p>
+          <small>[SPACE] PLAY/PAUSE &nbsp;|&nbsp; [X] MIRROR &nbsp;|&nbsp; [A / B] LOOP &nbsp;|&nbsp; [M] CUE POINT</small>
         </div>
       </div>
 
-      <!-- Timeline Customizada com Loop A-B e Markers -->
-      <div class="timeline-container">
+      <div class="timeline-deck">
+        <div class="timebar-header">
+          <span id="currentTimeText" class="mono">00:00.00</span>
+          <span id="loopStatusText" class="mono muted">LOOP: INATIVO</span>
+          <span id="durationText" class="mono">00:00.00</span>
+        </div>
+
         <div class="timeline-track" id="timelineTrack">
           <div class="loop-region" id="loopRegion" hidden></div>
           <div class="timeline-progress" id="timelineProgress"></div>
           <div class="markers-layer" id="markersLayer"></div>
         </div>
-        <div class="time-readout">
-          <span id="currentTimeText">00:00.0</span>
-          <span id="loopStatusText">Loop: OFF</span>
-          <span id="durationText">00:00.0</span>
-        </div>
-      </div>
 
-      <!-- Barra de Controles do Player -->
-      <div class="controls-bar">
-        <div class="control-group">
-          <button id="playPauseBtn" class="btn btn-primary">Play</button>
-          <button id="mirrorBtn" class="btn">Espelhar (X)</button>
-        </div>
+        <div class="transport-bar">
+          <div class="btn-cluster">
+            <button type="button" id="playPauseBtn" class="btn btn-active">PLAY</button>
+            <button type="button" id="mirrorBtn" class="btn">MIRROR [X]</button>
+          </div>
 
-        <div class="control-group">
-          <button id="setABtn" class="btn">Ponto A [</button>
-          <button id="setBBtn" class="btn">Ponto B ]</button>
-          <button id="clearLoopBtn" class="btn btn-danger">Limpar Loop</button>
-        </div>
+          <div class="btn-cluster">
+            <button type="button" id="setABtn" class="btn">IN [A]</button>
+            <button type="button" id="setBBtn" class="btn">OUT [B]</button>
+            <button type="button" id="clearLoopBtn" class="btn">CLEAR</button>
+          </div>
 
-        <div class="control-group">
-          <label for="speedSelect">Velocidade:</label>
-          <select id="speedSelect">
-            <option value="0.25">0.25x</option>
-            <option value="0.5">0.50x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1" selected>1.00x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.50x</option>
-          </select>
-        </div>
+          <div class="btn-cluster">
+            <label for="speedSelect" class="inline-label">RATE</label>
+            <select id="speedSelect" class="mono">
+              <option value="0.25">0.25x</option>
+              <option value="0.5">0.50x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1.00x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.50x</option>
+            </select>
+          </div>
 
-        <div class="control-group">
-          <input type="text" id="markerNameInput" placeholder="Nome (ex: Refrão)" />
-          <button id="addMarkerBtn" class="btn btn-accent">+ Marcador (M)</button>
+          <div class="btn-cluster cue-form">
+            <input type="text" id="markerNameInput" placeholder="Nome da marcação..." maxlength="32" />
+            <button type="button" id="addMarkerBtn" class="btn">+ CUE [M]</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Coluna Direita: Stage Grid & Lista de Marcadores -->
-    <aside class="sidebar">
-      <div class="panel">
-        <div class="panel-header">
-          <h2>Stage Grid (Formação)</h2>
-          <div class="stage-actions">
-            <button id="addDancerBtn" class="btn btn-sm">+ Dançarino</button>
-            <button id="resetStageBtn" class="btn btn-sm">Resetar</button>
+    <aside class="inspector-column">
+      <section class="inspector-pane">
+        <header class="pane-header">
+          <h2>STAGE BLOCKING</h2>
+          <div class="btn-cluster">
+            <button type="button" id="addDancerBtn" class="btn btn-compact">+ PIN</button>
+            <button type="button" id="resetStageBtn" class="btn btn-compact">RESET</button>
           </div>
+        </header>
+        <div class="canvas-holder">
+          <canvas id="stageCanvas" width="320" height="220"></canvas>
         </div>
-        <p class="panel-hint">Arraste os pinos para mapear as posições no palco (FRENTE = base inferior).</p>
-        <canvas id="stageCanvas" width="320" height="240"></canvas>
-      </div>
+      </section>
 
-      <div class="panel markers-panel">
-        <div class="panel-header">
-          <h2>Marcadores & Formações</h2>
-        </div>
-        <ul id="markersList" class="markers-list"></ul>
-      </div>
+      <section class="inspector-pane pane-fill">
+        <header class="pane-header">
+          <h2>CUE POINTS</h2>
+          <span id="cueCount" class="mono muted">0</span>
+        </header>
+        <ul id="markersList" class="cue-list"></ul>
+      </section>
     </aside>
   </main>
 
